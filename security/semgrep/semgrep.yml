@@ -47,7 +47,6 @@ rules:
     languages:
       - javascript
       - typescript
-      - jsx
     message: "Review dangerous HTML injection."
     severity: WARNING
     mode: search
