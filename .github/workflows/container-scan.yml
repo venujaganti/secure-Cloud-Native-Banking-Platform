@@ -39,8 +39,8 @@ jobs:
       - name: Install Docker
         run: |
           sudo apt-get update
-          sudo apt-get remove -y containerd || true
-          sudo apt-get install -y docker.io
+          sudo apt-get autoremove -y
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --fix-broken docker.io
           docker --version
 
       - name: Build container image
