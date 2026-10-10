@@ -51,9 +51,7 @@ jobs:
             .
 
       - name: Install Trivy
-        uses: aquasecurity/setup-trivy@v0.2.1
-        with:
-          version: latest
+        uses: aquasecurity/trivy-action@master
 
       # Save the report first so scan findings are visible even when the security gate fails.
       - name: Scan container image and write JSON report
@@ -102,9 +100,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Trivy
-        uses: aquasecurity/setup-trivy@v0.2.1
-        with:
-          version: latest
+        uses: aquasecurity/trivy-action@master
 
       - name: Scan all repository files and directories
         continue-on-error: true
