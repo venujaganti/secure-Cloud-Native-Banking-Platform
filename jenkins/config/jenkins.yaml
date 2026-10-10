@@ -1,0 +1,46 @@
+jenkins:
+  systemMessage: |
+    Secure Cloud-Native Banking Platform
+    Jenkins CI/CD Server
+
+    Managed using Jenkins Configuration as Code.
+
+  numExecutors: 2
+
+  mode: NORMAL
+
+  scmCheckoutRetryCount: 3
+
+  quietPeriod: 5
+
+  globalNodeProperties:
+    - envVars:
+        env:
+          - key: "APP_NAME"
+            value: "secure-cloud-native-banking"
+          - key: "KUBE_NAMESPACE"
+            value: "banking"
+          - key: "TZ"
+            value: "Asia/Kolkata"
+
+  securityRealm:
+    local:
+      allowsSignup: false
+      enableCaptcha: false
+
+      users:
+        - id: "${JENKINS_ADMIN_USERNAME:-admin}"
+          password: "${JENKINS_ADMIN_PASSWORD}"
+
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+  remotingSecurity:
+    enabled: true
+
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: true
+
+  disableRememberMe: false

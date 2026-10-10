@@ -1,0 +1,111 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: gateway-config-reader
+  namespace: banking
+subjects:
+  - kind: ServiceAccount
+    name: gateway-sa
+    namespace: banking
+roleRef:
+  kind: Role
+  name: banking-config-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: auth-config-reader
+  namespace: banking
+subjects:
+  - kind: ServiceAccount
+    name: auth-sa
+    namespace: banking
+roleRef:
+  kind: Role
+  name: banking-config-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: user-config-reader
+  namespace: banking
+subjects:
+  - kind: ServiceAccount
+    name: user-sa
+    namespace: banking
+roleRef:
+  kind: Role
+  name: banking-config-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: account-config-reader
+  namespace: banking
+subjects:
+  - kind: ServiceAccount
+    name: account-sa
+    namespace: banking
+roleRef:
+  kind: Role
+  name: banking-config-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: transaction-config-reader
+  namespace: banking
+subjects:
+  - kind: ServiceAccount
+    name: transaction-sa
+    namespace: banking
+roleRef:
+  kind: Role
+  name: banking-config-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: payment-config-reader
+  namespace: banking
+subjects:
+  - kind: ServiceAccount
+    name: payment-sa
+    namespace: banking
+roleRef:
+  kind: Role
+  name: banking-config-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: notification-config-reader
+  namespace: banking
+subjects:
+  - kind: ServiceAccount
+    name: notification-sa
+    namespace: banking
+roleRef:
+  kind: Role
+  name: banking-config-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: audit-config-reader
+  namespace: banking
+subjects:
+  - kind: ServiceAccount
+    name: audit-sa
+    namespace: banking
+roleRef:
+  kind: Role
+  name: banking-config-reader
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,21 @@
+title = "Secure Cloud-Native Banking Platform - Gitleaks Configuration"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allow non-sensitive project files and documentation"
+
+paths = [
+    '''(^|/)\.git/''',
+    '''(^|/)node_modules/''',
+    '''(^|/)target/''',
+    '''(^|/)build/''',
+    '''(^|/)dist/''',
+    '''(^|/)coverage/''',
+    '''(^|/)security/trivy/reports/'''
+]
+
+regexTarget = "match"
+
+commits = []

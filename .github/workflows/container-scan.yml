@@ -1,0 +1,143 @@
+name: Container Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+concurrency:
+  group: container-scan-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  container-scan:
+    name: Build and Scan Container Images (${{ matrix.service }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - gateway
+          - auth
+          - user
+          - account
+          - transaction
+          - payment
+          - notification
+          - audit
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Install Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+          docker --version
+
+      - name: Build container image
+        id: build_container_image
+        run: |
+          docker build \
+            --file "deployment/docker/Dockerfile.${{ matrix.service }}" \
+            --tag "banking-${{ matrix.service }}:${{ github.sha }}" \
+            .
+
+      - name: Install Trivy
+        uses: aquasecurity/setup-trivy@v0.2.2
+        with:
+          version: latest
+
+      # Save the report first so scan findings are visible even when the security gate fails.
+      - name: Scan container image and write JSON report
+        id: image_scan
+        if: always() && steps.build_container_image.outcome == 'success'
+        continue-on-error: true
+        run: |
+          mkdir -p reports/trivy
+          trivy image \
+            --config security/trivy/trivy.yaml \
+            --format json \
+            --output "reports/trivy/image-${{ matrix.service }}.json" \
+            --exit-code 0 \
+            "banking-${{ matrix.service }}:${{ github.sha }}"
+          trivy image \
+            --config security/trivy/trivy.yaml \
+            --format table \
+            --exit-code 0 \
+            "banking-${{ matrix.service }}:${{ github.sha }}"
+
+      - name: Upload image scan report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-image-report-${{ matrix.service }}
+          path: reports/trivy/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      # The gate is separate from reporting so every image scan can finish and publish results.
+      - name: Enforce image vulnerability policy
+        if: always() && steps.build_container_image.outcome == 'success'
+        run: |
+          trivy image \
+            --config security/trivy/trivy.yaml \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            --exit-code 1 \
+            "banking-${{ matrix.service }}:${{ github.sha }}"
+
+  filesystem-scan:
+    name: Scan Repository Filesystem
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Install Trivy
+        uses: aquasecurity/setup-trivy@v0.2.2
+        with:
+          version: latest
+
+      - name: Scan all repository files and directories
+        continue-on-error: true
+        run: |
+          mkdir -p reports/trivy
+          trivy fs . \
+            --scanners vuln,secret,misconfig,license \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            --format json \
+            --output reports/trivy/filesystem.json \
+            --exit-code 0
+          trivy fs . \
+            --scanners vuln,secret,misconfig,license \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            --format table \
+            --exit-code 0
+
+      - name: Upload filesystem scan report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-filesystem-report
+          path: reports/trivy/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Enforce filesystem vulnerability policy
+        if: always()
+        run: |
+          trivy fs . \
+            --scanners vuln,secret,misconfig,license \
+            --severity HIGH,CRITICAL \
+            --ignore-unfixed \
+            --exit-code 1

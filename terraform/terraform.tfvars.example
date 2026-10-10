@@ -1,0 +1,59 @@
+aws_region  = "ap-south-1"
+project_name = "secure-banking"
+environment  = "dev"
+
+vpc_cidr = "10.0.0.0/16"
+
+availability_zones = [
+  "ap-south-1a",
+  "ap-south-1b"
+]
+
+public_subnet_cidrs = [
+  "10.0.1.0/24",
+  "10.0.2.0/24"
+]
+
+private_subnet_cidrs = [
+  "10.0.11.0/24",
+  "10.0.12.0/24"
+]
+
+ec2_instance_type    = "m7i-flex.large"
+ec2_root_volume_size = 40
+
+# CHANGE THIS TO YOUR PUBLIC IP/32 BEFORE DEPLOYMENT.
+ec2_ssh_cidr = "0.0.0.0/0"
+
+app_repository_url    = "https://github.com/venujaganti/secure-cloud-native-banking-platform.git"
+app_repository_branch = "main"
+
+app_port = 8080
+
+eks_version           = "1.36"
+eks_node_instance_type = "m7i-flex.large"
+eks_node_disk_size     = 40
+eks_desired_nodes      = 2
+eks_min_nodes          = 1
+eks_max_nodes          = 3
+
+rds_instance_class = "db.t3.micro"
+rds_engine_version = "16"
+rds_storage_size   = 20
+
+database_name     = "banking"
+database_username = "bankingadmin"
+
+# CHANGE THIS.
+database_password = "CHANGE_THIS_TO_A_STRONG_PASSWORD"
+
+redis_node_type = "cache.t3.micro"
+
+# Optional:
+domain_name = ""
+
+create_route53_zone = false
+
+enable_deletion_protection = false
+# Use a unique random value in your real terraform.tfvars.
+jwt_secret = "CHANGE_THIS_TO_A_RANDOM_SECRET_AT_LEAST_32_CHARACTERS"

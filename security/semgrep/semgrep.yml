@@ -1,0 +1,54 @@
+rules:
+  - id: banking-hardcoded-password
+    languages:
+      - java
+      - javascript
+      - typescript
+    message: "Possible hardcoded password detected."
+    severity: ERROR
+    mode: search
+    pattern-either:
+      - pattern: |
+          String $VAR = "...";
+      - pattern: |
+          const $VAR = "...";
+      - pattern: |
+          let $VAR = "...";
+    metavariable-regex:
+      metavariable: $VAR
+      regex: (?i).*(password|passwd|secret|token|apikey|api_key).*
+
+  - id: banking-dangerous-runtime-exec
+    languages:
+      - java
+    message: "Review use of runtime command execution."
+    severity: WARNING
+    mode: search
+    pattern: Runtime.getRuntime().exec(...)
+
+  - id: banking-java-process-builder
+    languages:
+      - java
+    message: "Review ProcessBuilder usage for command injection risks."
+    severity: WARNING
+    mode: search
+    pattern: new ProcessBuilder(...)
+
+  - id: banking-javascript-eval
+    languages:
+      - javascript
+      - typescript
+    message: "Avoid eval() because it can execute untrusted code."
+    severity: ERROR
+    mode: search
+    pattern: eval(...)
+
+  - id: banking-dangerous-innerhtml
+    languages:
+      - javascript
+      - typescript
+      - jsx
+    message: "Review dangerous HTML injection."
+    severity: WARNING
+    mode: search
+    pattern: $X.innerHTML = $Y

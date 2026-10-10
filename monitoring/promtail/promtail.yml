@@ -1,0 +1,45 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+
+  - job_name: banking-application-logs
+
+    static_configs:
+      - targets:
+          - localhost
+
+        labels:
+          job: banking-application
+          environment: production
+          __path__: /var/log/banking/*.log
+
+    pipeline_stages:
+
+      - regex:
+          expression: '^(?P<timestamp>\S+)\s+(?P<level>[A-Z]+)\s+(?P<message>.*)$'
+
+      - labels:
+          level:
+
+      - timestamp:
+          source: timestamp
+          format: RFC3339
+
+  - job_name: banking-system-logs
+
+    static_configs:
+      - targets:
+          - localhost
+
+        labels:
+          job: system
+          environment: production
+          __path__: /var/log/*.log

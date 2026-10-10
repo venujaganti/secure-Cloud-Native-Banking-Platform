@@ -1,0 +1,46 @@
+# Terraform
+.terraform/
+.terraform.lock.hcl
+
+# Terraform state
+*.tfstate
+*.tfstate.*
+terraform.tfstate
+terraform.tfstate.*
+
+# Terraform variables containing secrets
+terraform.tfvars
+*.auto.tfvars
+*.auto.tfvars.json
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Terraform plan files
+*.tfplan
+*.plan
+
+# Generated private key
+pem.key
+*.pem
+*.key
+
+# SSH keys
+id_rsa
+id_rsa.pub
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

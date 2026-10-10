@@ -1,0 +1,40 @@
+{
+  "clients": [
+    {
+      "clientId": "banking-frontend",
+      "name": "Banking Frontend",
+      "type": "public",
+      "protocol": "openid-connect",
+      "authentication": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "pkce": {
+        "enabled": true,
+        "codeChallengeMethod": "S256"
+      },
+      "redirectUris": [
+        "http://localhost:5173/*"
+      ],
+      "webOrigins": [
+        "http://localhost:5173"
+      ],
+      "postLogoutRedirectUris": [
+        "http://localhost:5173/*"
+      ]
+    },
+    {
+      "clientId": "banking-api",
+      "name": "Banking API",
+      "type": "confidential",
+      "protocol": "openid-connect",
+      "authentication": true,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "clientAuthenticationMethod": "client-secret"
+    }
+  ]
+}

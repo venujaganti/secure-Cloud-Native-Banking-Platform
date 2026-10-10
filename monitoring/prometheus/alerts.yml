@@ -1,0 +1,102 @@
+groups:
+
+  - name: banking-application-alerts
+    interval: 30s
+
+    rules:
+
+      - alert: ServiceDown
+        expr: up{job=~".*-service|banking-gateway"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          category: availability
+        annotations:
+          summary: "Banking service is down"
+          description: "The service {{ $labels.job }} has been unavailable for more than 2 minutes."
+
+      - alert: HighRequestErrorRate
+        expr: |
+          (
+            sum(rate(http_server_requests_seconds_count{status=~"5.."}[5m]))
+            /
+            sum(rate(http_server_requests_seconds_count[5m]))
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          category: application
+        annotations:
+          summary: "High HTTP 5xx error rate"
+          description: "More than 5% of HTTP requests are returning 5xx responses."
+
+      - alert: HighRequestLatency
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(
+              rate(http_server_requests_seconds_bucket[5m])
+            ) by (le)
+          ) > 1
+        for: 5m
+        labels:
+          severity: warning
+          category: performance
+        annotations:
+          summary: "High HTTP request latency"
+          description: "95th percentile HTTP latency is above 1 second."
+
+      - alert: HighJvmMemoryUsage
+        expr: |
+          (
+            jvm_memory_used_bytes{area="heap"}
+            /
+            jvm_memory_max_bytes{area="heap"}
+          ) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          category: resource
+        annotations:
+          summary: "High JVM heap usage"
+          description: "JVM heap usage is above 85%."
+
+      - alert: HighJvmThreads
+        expr: jvm_threads_live_threads > 300
+        for: 5m
+        labels:
+          severity: warning
+          category: resource
+        annotations:
+          summary: "High JVM thread count"
+          description: "A Java service has more than 300 live threads."
+
+  - name: banking-infrastructure-alerts
+    interval: 30s
+
+    rules:
+
+      - alert: PrometheusTargetDown
+        expr: up == 0
+        for: 5m
+        labels:
+          severity: warning
+          category: monitoring
+        annotations:
+          summary: "Prometheus target is down"
+          description: "Prometheus target {{ $labels.instance }} is down."
+
+      - alert: PrometheusStorageNearLimit
+        expr: |
+          (
+            prometheus_tsdb_storage_blocks_bytes
+            /
+            prometheus_tsdb_retention_limit_bytes
+          ) > 0.80
+        for: 10m
+        labels:
+          severity: warning
+          category: monitoring
+        annotations:
+          summary: "Prometheus storage usage is high"
+          description: "Prometheus storage usage has exceeded 80%."

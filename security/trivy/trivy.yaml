@@ -1,0 +1,28 @@
+scan:
+  scanners:
+    - vuln
+    - secret
+    - misconfig
+
+vulnerability:
+  type:
+    - os
+    - library
+
+  ignore-unfixed: true
+
+severity:
+  - HIGH
+  - CRITICAL
+
+misconfiguration:
+  include-non-failures: false
+
+
+format: table
+
+exit-code: 1
+
+timeout: 10m0s
+
+cache-dir: .trivy-cache

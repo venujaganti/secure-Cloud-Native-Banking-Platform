@@ -1,0 +1,73 @@
+groups:
+
+  - name: kubernetes-rules
+    interval: 30s
+
+    rules:
+
+      - alert: KubernetesPodCrashLooping
+        expr: |
+          increase(
+            kube_pod_container_status_restarts_total[15m]
+          ) > 3
+        for: 5m
+        labels:
+          severity: critical
+          category: kubernetes
+        annotations:
+          summary: "Kubernetes pod is restarting frequently"
+          description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} has restarted more than 3 times in 15 minutes."
+
+      - alert: KubernetesPodNotReady
+        expr: |
+          kube_pod_status_ready{
+            condition="true"
+          } == 0
+        for: 10m
+        labels:
+          severity: warning
+          category: kubernetes
+        annotations:
+          summary: "Kubernetes pod is not ready"
+          description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} has not been ready for 10 minutes."
+
+      - alert: KubernetesDeploymentReplicasMismatch
+        expr: |
+          kube_deployment_spec_replicas
+          !=
+          kube_deployment_status_available_replicas
+        for: 10m
+        labels:
+          severity: warning
+          category: kubernetes
+        annotations:
+          summary: "Deployment replicas mismatch"
+          description: "Deployment {{ $labels.namespace }}/{{ $labels.deployment }} does not have the expected number of available replicas."
+
+      - alert: KubernetesNodeMemoryPressure
+        expr: |
+          kube_node_status_condition{
+            condition="MemoryPressure",
+            status="true"
+          } == 1
+        for: 5m
+        labels:
+          severity: critical
+          category: kubernetes
+        annotations:
+          summary: "Kubernetes node memory pressure"
+          description: "Node {{ $labels.node }} is under memory pressure."
+
+      - alert: KubernetesNodeDiskPressure
+        expr: |
+          kube_node_status_condition{
+            condition="DiskPressure",
+            status="true"
+          } == 1
+        for: 5m
+        labels:
+          severity: critical
+          category: kubernetes
+        annotations:
+          summary: "Kubernetes node disk pressure"
+          description: "Node {{ $labels.node }} is under disk pressure."

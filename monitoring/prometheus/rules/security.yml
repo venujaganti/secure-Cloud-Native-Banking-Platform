@@ -1,0 +1,58 @@
+groups:
+
+  - name: banking-security-rules
+    interval: 30s
+
+    rules:
+
+      - alert: AuthenticationFailureSpike
+        expr: |
+          increase(
+            banking_authentication_failures_total[5m]
+          ) > 20
+        for: 2m
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "Authentication failure spike detected"
+          description: "More than 20 authentication failures were recorded within 5 minutes."
+
+      - alert: SuspiciousTransactionActivity
+        expr: |
+          increase(
+            banking_suspicious_transactions_total[5m]
+          ) > 5
+        for: 1m
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "Suspicious transaction activity detected"
+          description: "More than 5 suspicious transactions were detected within 5 minutes."
+
+      - alert: UnauthorizedAccessAttempts
+        expr: |
+          increase(
+            banking_unauthorized_access_total[5m]
+          ) > 10
+        for: 2m
+        labels:
+          severity: warning
+          category: security
+        annotations:
+          summary: "Unauthorized access attempts detected"
+          description: "More than 10 unauthorized access attempts were detected within 5 minutes."
+
+      - alert: SecurityAuditFailure
+        expr: |
+          increase(
+            banking_security_audit_failures_total[5m]
+          ) > 0
+        for: 1m
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "Security audit failure detected"
+          description: "A security audit failure has been reported by the banking platform."

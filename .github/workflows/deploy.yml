@@ -1,0 +1,141 @@
+name: Kubernetes Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Deployment environment
+        required: true
+        default: production
+        type: choice
+        options:
+          - production
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: deployment-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Kubernetes
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: latest
+
+      - name: Install Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+
+      - name: Log in to GitHub Container Registry
+        env:
+          CR_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          printf '%s' "$CR_PAT" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build and push service images
+        env:
+          IMAGE_OWNER: ${{ github.repository_owner }}
+          IMAGE_REPOSITORY: ${{ github.event.repository.name }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          for service in gateway auth user account transaction payment notification audit; do
+            docker build --file "deployment/docker/Dockerfile.${service}" --tag "ghcr.io/${IMAGE_OWNER}/${IMAGE_REPOSITORY}/${service}:${IMAGE_TAG}" .
+            docker push "ghcr.io/${IMAGE_OWNER}/${IMAGE_REPOSITORY}/${service}:${IMAGE_TAG}"
+          done
+
+      - name: Pin Kubernetes images to this commit
+        env:
+          IMAGE_OWNER: ${{ github.repository_owner }}
+          IMAGE_REPOSITORY: ${{ github.event.repository.name }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          for service in gateway auth user account transaction payment notification audit; do
+            sed -i "s#newName: banking/${service}#newName: ghcr.io/${IMAGE_OWNER}/${IMAGE_REPOSITORY}/${service}#" deployment/kubernetes/kustomization.yaml
+          done
+          sed -i "s#newTag: \"1.0.0\"#newTag: \"${IMAGE_TAG}\"#g" deployment/kubernetes/kustomization.yaml
+
+      - name: Configure Kubernetes credentials
+        shell: bash
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${KUBE_CONFIG_DATA}" ]; then
+            echo "KUBE_CONFIG_DATA GitHub Secret is not configured."
+            exit 1
+          fi
+
+          mkdir -p "${HOME}/.kube"
+
+          printf '%s' "${KUBE_CONFIG_DATA}" | base64 --decode > "${HOME}/.kube/config"
+
+          chmod 600 "${HOME}/.kube/config"
+
+      - name: Verify Kubernetes connection
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
+      - name: Validate Kubernetes manifests
+        run: |
+          kubectl kustomize deployment/kubernetes/ > /tmp/rendered-manifests.yaml
+
+      - name: Apply Kubernetes manifests
+        run: |
+          kubectl apply -k deployment/kubernetes/
+
+      - name: Wait for deployments
+        run: |
+          kubectl rollout status deployment/gateway \
+            --namespace=banking \
+            --timeout=300s
+
+          kubectl rollout status deployment/auth-service \
+            --namespace=banking \
+            --timeout=300s
+
+          kubectl rollout status deployment/user-service \
+            --namespace=banking \
+            --timeout=300s
+
+          kubectl rollout status deployment/account-service \
+            --namespace=banking \
+            --timeout=300s
+
+          kubectl rollout status deployment/transaction-service \
+            --namespace=banking \
+            --timeout=300s
+
+          kubectl rollout status deployment/payment-service \
+            --namespace=banking \
+            --timeout=300s
+
+          kubectl rollout status deployment/notification-service \
+            --namespace=banking \
+            --timeout=300s
+
+          kubectl rollout status deployment/audit-service \
+            --namespace=banking \
+            --timeout=300s
+
+      - name: Verify Kubernetes resources
+        run: |
+          kubectl get pods -n banking
+          kubectl get services -n banking
+          kubectl get ingress -n banking

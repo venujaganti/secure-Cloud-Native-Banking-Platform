@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property>
+        <name>failBuildOnCVSS</name>
+        <value>7.0</value>
+    </property>
+
+    <property>
+        <name>skipTestScope</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>format</name>
+        <value>HTML</value>
+    </property>
+
+    <property>
+        <name>outputDirectory</name>
+        <value>security/trivy/reports</value>
+    </property>
+
+    <property>
+        <name>autoUpdate</name>
+        <value>true</value>
+    </property>
+</configuration>

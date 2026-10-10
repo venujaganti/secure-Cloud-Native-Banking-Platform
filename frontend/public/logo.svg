@@ -1,0 +1,8 @@
+<svg width="180" height="48" viewBox="0 0 180 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="48" height="48" rx="14" fill="#2563EB"/>
+  <path d="M24 10L35 15V23.5C35 30.6 30.3 36.2 24 39C17.7 36.2 13 30.6 13 23.5V15L24 10Z" fill="white"/>
+  <path d="M24 16L29 18.3V23.4C29 26.8 27 29.5 24 31C21 29.5 19 26.8 19 23.4V18.3L24 16Z" fill="#2563EB"/>
+  <text x="60" y="31" fill="#E5E7EB" font-family="Arial, sans-serif" font-size="20" font-weight="700">
+    SecureBank
+  </text>
+</svg>

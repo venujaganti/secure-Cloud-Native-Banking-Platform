@@ -1,0 +1,125 @@
+# Java
+
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven
+
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+
+# Operating System
+
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Environment files
+
+.env
+.env.*
+!.env.example
+
+# Logs
+
+*.log
+logs/
+
+# Temporary files
+
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Build and coverage
+
+coverage/
+reports/
+jacoco/
+test-results/
+
+# Node
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+
+**pycache**/
+*.py[cod]
+.venv/
+venv/
+
+# Terraform
+
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+!terraform.tfvars.example
+.terraform.lock.hcl
+
+# Kubernetes
+
+*.secret.yaml
+*-secret.yaml
+
+# Docker
+
+docker-machine-default/
+
+# Security scan reports
+
+trivy-report.json
+trivy-report.txt
+dependency-check-report.xml
+dependency-check-report.html
+sonar-report/
+
+# Jenkins
+
+jenkins_home/
+
+# SSH keys and certificates
+
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Local configuration
+
+*.local
+config.local.*
+
+# Generated files
+
+dist/
+build/
+out/
+
+# Terraform secrets and state
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/pem.key
+terraform/*.tfvars
+!terraform/terraform.tfvars.example

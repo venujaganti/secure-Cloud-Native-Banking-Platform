@@ -1,0 +1,52 @@
+# ============================================================
+# Secure Cloud-Native Banking Platform
+# Auth Service Container
+# ============================================================
+
+FROM maven:3.9-eclipse-temurin-17 AS builder
+
+WORKDIR /app
+
+COPY services/auth-service/pom.xml services/auth-service/pom.xml
+
+RUN mvn -B -f services/auth-service/pom.xml dependency:go-offline
+
+COPY services/auth-service/src services/auth-service/src
+
+RUN mvn -B \
+    -f services/auth-service/pom.xml \
+    clean package \
+    -DskipTests
+
+RUN JAR_FILE=$(find services/auth-service/target \
+    -maxdepth 1 \
+    -type f \
+    -name "*.jar" \
+    ! -name "original-*" \
+    | head -n 1) && \
+    test -n "$JAR_FILE" && \
+    cp "$JAR_FILE" /app/app.jar
+
+
+FROM eclipse-temurin:17-jre
+
+WORKDIR /app
+
+RUN groupadd --system banking && \
+    useradd --system \
+    --gid banking \
+    --home-dir /app \
+    --shell /usr/sbin/nologin \
+    banking
+
+COPY --from=builder /app/app.jar /app/app.jar
+
+RUN chown banking:banking /app/app.jar
+
+USER banking
+
+EXPOSE 8081
+
+ENV JAVA_OPTS=""
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]

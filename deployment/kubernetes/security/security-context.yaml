@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: banking-security-context
+  namespace: banking
+data:
+  runAsNonRoot: "true"
+  allowPrivilegeEscalation: "false"
+  readOnlyRootFilesystem: "true"
+  dropCapabilities: "ALL"
+  seccompProfile: "RuntimeDefault"
+  serviceAccountToken: "disabled-by-default"
