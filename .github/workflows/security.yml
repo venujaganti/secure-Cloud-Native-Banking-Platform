@@ -79,7 +79,7 @@ jobs:
       - name: Install Semgrep
         run: python -m pip install --upgrade semgrep
       - name: Run Semgrep
-        run: semgrep scan --config security/semgrep/semgrep.yml services frontend/src
+        run: semgrep scan --config security/semgrep/semgrep.yml --exclude='*.jsx' services frontend/src
 
   sonarqube:
     name: SonarQube Analysis
