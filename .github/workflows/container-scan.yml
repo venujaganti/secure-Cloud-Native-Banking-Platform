@@ -39,7 +39,8 @@ jobs:
       - name: Install Docker
         run: |
           sudo apt-get update
-          sudo dpkg --remove --force-all containerd 2>/dev/null || true
+          sudo apt-get remove -y containerd containerd.io 2>/dev/null || true
+          sudo apt-get autoremove -y
           sudo apt-get install -y docker.io
           docker --version
 
